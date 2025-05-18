@@ -54,6 +54,7 @@ gem "sassc-rails"
 gem "ruby-openai"
 gem "solid_cache"
 gem "cloudinary"
+gem 'redcarpet'
 
 group :development, :test do
   gem "dotenv-rails"
