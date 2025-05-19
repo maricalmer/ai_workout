@@ -6,8 +6,6 @@ Based on user input the AI trainer will recommend a set of exercises for a worko
 
 <img align="right" width="400" src="https://res.cloudinary.com/dzaz6s9ar/image/upload/v1747655720/My_Movie_hfi0qj.gif" />
 
-<br clear="right"/>
-
 ## Web App
 
 The AI trainer is developed with Ruby and supported by the Rails framework. It follows the MVC pattern, uses Active Record as an interface for a PostgreSQL database. Authentication is operated through Devise. Generated text and image supported by OpenAI’s API.
