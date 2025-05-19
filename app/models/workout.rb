@@ -2,41 +2,85 @@ require "open-uri"
 
 class Workout < ApplicationRecord
   has_one_attached :photo
-  after_save :set_content, if: -> { saved_change_to_focus? || saved_change_to_equipment? }
+  after_save :generate_workout_content, if: -> { saved_change_to_focus? || saved_change_to_equipment? }
   
   def content
-    if super.blank?
-      set_content
-    else
-      super
-    end
+    super.presence || generate_workout_content
   end
 
-  def set_content
-    client = OpenAI::Client.new
-    chatgpt_response = client.chat(parameters: {
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: "You are a certified personal trainer helping people create custom workout routines. Please create a personalized workout routine based on the following details: - Available Equipment: #{equipment} - Workout Focus: #{focus}. The routine should include: 5 exercises with sets and reps as well as notes or tips for proper form or equipment use. Please format the response clearly using Markdown-style structure."}]
-    })
-    new_content = chatgpt_response["choices"][0]["message"]["content"]
-
-    update(content: new_content)
-    return new_content
+  def photo_url
+    return unless photo.attached?
+    
+    if Rails.application.config.active_storage.service == :cloudinary
+      # For Cloudinary
+      photo.key
+    else
+      # For local storage
+      Rails.application.routes.url_helpers.url_for(photo)
+    end
   end
 
   private
 
-  def set_photo
-    client = OpenAI::Client.new
-    response = client.images.generate(parameters: {
-      prompt: "An image of #{name}", size: "256x256"
-    })
+  def generate_workout_content
+    generate_content
+    set_photo
+  rescue OpenAI::Error => e
+    Rails.logger.error "OpenAI Error: #{e.message}"
+    nil
+  end
 
-    url = response["data"][0]["url"]
-    file =  URI.parse(url).open
+  def generate_content
+    client = OpenAI::Client.new
+    response = client.chat(
+      parameters: {
+        model: "gpt-4",
+        messages: [{
+          role: "user",
+          content: <<~PROMPT
+            As a certified personal trainer, create a workout routine with:
+            - Equipment: #{equipment}
+            - Focus: #{focus}
+
+            Provide 5 exercises in this exact format using Markdown-style structure:
+            Exercise 1: [Name]
+            Sets/Reps: [X sets x Y reps]
+            Notes: [Tips]
+            ---
+            Exercise 2: [Name]
+            ...
+          PROMPT
+        }]
+      }
+    )
+
+    update(content: response.dig("choices", 0, "message", "content"))
+  end
+
+  def set_photo
+    exercises = content.scan(/Exercise \d+: (.+)/).flatten
+    return if exercises.empty?
+
+    client = OpenAI::Client.new
+    response = client.images.generate(
+      parameters: {
+        model: "dall-e-3",
+        prompt: "A professional fitness illustration showing these 5 exercises: #{exercises.join(', ')}",
+        size: "1024x1024"
+      }
+    )
+
+    image_url = response.dig("data", 0, "url")
+    downloaded_image = URI.open(image_url)
 
     photo.purge if photo.attached?
-    photo.attach(io: file, filename: "ai_generated_image.jpg", content_type: "image/png")
-    return photo
+    photo.attach(
+      io: downloaded_image,
+      filename: "workout_#{id}_exercises.jpg",
+      content_type: "image/jpeg"
+    )
+  rescue => e
+    Rails.logger.error "Failed to generate workout image: #{e.message}"
+    nil
   end
 end

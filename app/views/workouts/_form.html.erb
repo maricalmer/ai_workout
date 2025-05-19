@@ -1,14 +1,28 @@
-
-<%= simple_form_for(@workout) do |f| %>
+<%= simple_form_for(@workout, 
+      html: { 
+        data: { 
+          controller: "form", 
+          action: "submit->form#submit" 
+        } 
+      }) do |f| %>
   <%= f.error_notification %>
-  <%= f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present? %>
-
-  <div class="form-inputs">
-    <%= f.input :equipment %>
-    <%= f.input :focus %>
+  
+  <div class="form-inputs mt-5">
+    <%= f.input :equipment, label: "Do you have training equipment?", input_html: { placeholder: "dumbbells, resistance bands, none..." } %>
+    <%= f.input :focus, label: "What's your fitness focus?", input_html: { placeholder: "strength, cardio, flexibility, full body, back..." } %>
   </div>
 
-  <div class="form-actions">
-    <%= f.button :submit %>
+  <div class="form-actions text-center mt-4">
+    <%= f.button :submit, 
+          class: "btn btn-cta px-4 py-2", 
+          data: { "form-target": "submitBtn" } %>
+          
+    <div type="button" 
+            class="btn btn-cta px-4 py-2 d-none" 
+            disabled
+            data-form-target="loadingBtn">
+      <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+      Loading...
+    </div>
   </div>
 <% end %>

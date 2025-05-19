@@ -1,15 +1,25 @@
 <div id="<%= dom_id workout %>">
-  <p>
-    <strong>Equipment:</strong>
-    <%= workout.equipment %>
-  </p>
-
-  <p>
-    <strong>Focus:</strong>
-    <%= workout.focus %>
-  </p>
-
-  <p>
+  <div class="workout-container">
     <%= markdown(workout.content) %>
-  </p>
+  </div>
 </div>
+<div class="d-flex justify-content-center mb-5">
+  <button type="button" class="btn btn-cta m-auto mt-0" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    See illustration
+  </button>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <% if @workout.photo.attached? %>
+          <div class="workout-image">
+            <%= cl_image_tag @workout.photo.key, width: 500, height: 500, crop: :fill, class: "rounded-lg shadow-md d-block m-auto" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>

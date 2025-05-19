@@ -1,1 +1,43 @@
-// Specific CSS for your home-page
+.cta-container {
+  margin: auto;
+  margin-top: 5rem;
+  padding: 2rem;
+  border: 1px solid #FFF5EB;
+  background-color: #FFEBD6;
+  width: 50%;
+  border-radius: 16px;
+}
+
+.cta-title {
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+.cta-text-1 {
+  margin-top: 4rem;
+  font-size: 1.5rem;
+}
+
+.cta-text-2 {
+  margin-top: 2rem;
+  font-size: 1.5rem;
+}
+
+.btn-cta {
+  padding: 1rem;
+  background-color: #FF6978;
+  font-weight: bold;
+  color: white;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  transition: 0.25s ease-out;
+  font-size: 1.5rem;
+  width: 15rem;
+  text-align: center;
+  margin: auto;
+  margin-top: 10rem;
+}
+
+.btn-cta:hover {
+  background-color: #FF475A;
+}
