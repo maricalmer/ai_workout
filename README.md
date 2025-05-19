@@ -4,7 +4,7 @@
 
 Based on user input the AI trainer will recommend a set of exercises for a workout routine. It will also generate an image illustrating the different exercises part of the generated set:
 
-<img align="right" width="400" src="./docs/ai_workout.gif" />
+<img align="center" width="400" src="./docs/ai_workout.gif" />
 
 ## Web App
 
